@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Portal Backend - Flask API
+  portal_backend:
+    build:
+      context: ../portal_samochodowy-main/backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - STORAGE_TYPE=local
+      - DISABLE_AUTH=true
+    volumes:
+      - ../portal_samochodowy-main/backend:/app
+      - ../portal_samochodowy-main/uploads:/app/uploads
+    command: python app.py
+
+  # Portal Frontend - Svelte + Vite
+  portal_frontend:
+    build:
+      context: ../portal_samochodowy-main/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_BACKEND_URL=http://portal_backend:5000
+    volumes:
+      - ../portal_samochodowy-main/frontend:/app
+      - /app/node_modules
+    depends_on:
+      - portal_backend
+
+  # MCP Service - Middleware for validation and guardrails
+  mcp_service:
+    build:
+      context: ../mcp_service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - BIELIK_APP_URL=https://studzinsky-bielik-app-service.hf.space
+    volumes:
+      - ../mcp_service/app:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+
+  # Retrieval Service - Load bulk ad descriptions
+  retrieval_service:
+    build:
+      context: ../otomoto-scraper
+      dockerfile: Dockerfile.retrieval
+    ports:
+      - "8003:8003"
+    volumes:
+      - ../otomoto-scraper/data:/app/data
+    command: python retrieval_service.py

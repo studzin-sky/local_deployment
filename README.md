@@ -16,10 +16,6 @@ Runs the complete Bielik Gap-Filling System (Bielik, MCP, RAG services) locally 
 ./launch.ps1
 ```
 
-This starts all three services:
-- **Bielik App Service**: http://localhost:8000
-- **MCP Service**: http://localhost:8001  
-- **RAG Service**: http://localhost:8002
 
 ## Folder Structure
 

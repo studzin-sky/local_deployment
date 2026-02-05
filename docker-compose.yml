@@ -42,9 +42,10 @@ services:
       - "8001:8001"
     environment:
       - BIELIK_APP_URL=https://studzinsky-bielik-app-service.hf.space
+      - PYTHONPATH=/app
     volumes:
-      - ../mcp_service/app:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+      - ../mcp_service:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 
   # Retrieval Service - Load bulk ad descriptions
   retrieval_service:
